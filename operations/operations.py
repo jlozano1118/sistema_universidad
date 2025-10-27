@@ -22,3 +22,17 @@ def crear_estudiante(session: Session, estudiante: Estudiante):
     session.commit()
     session.refresh(estudiante)
     return estudiante
+
+def listar_estudiantes_por_semestre(session: Session, semestre: int):
+    estudiantes = session.exec(
+        select(Estudiante).where(
+            (Estudiante.semestre == semestre) & (Estudiante.activo == True)
+        )
+    ).all()
+
+    if not estudiantes:
+        raise HTTPException(status_code=404, detail=f"No se encontraron estudiantes en el semestre {semestre}")
+
+    return estudiantes
+
+

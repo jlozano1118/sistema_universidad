@@ -4,7 +4,7 @@ from typing import List
 from utils.db import engine, crear_db, get_session
 from data.models import Estudiante,Curso,Matricula
 
-from operations.operations import (crear_estudiante)
+from operations.operations import (crear_estudiante,listar_estudiantes_por_semestre, actualizar_estudiante)
 
 app = FastAPI(
     title="API de Sistema de Gestion de Universidad",
@@ -22,4 +22,8 @@ def startup():
 @app.post("/estudiantes/", response_model=Estudiante, summary="Crear un nuevo estudiante")
 def crear_nuevo_estudiante(estudiante: Estudiante, session: Session = Depends(get_session)):
     return crear_estudiante(session, estudiante)
+
+@app.get("/estudiantes/", response_model=List[Estudiante], summary="Listar estudiantes por semestre")
+def obtener_estudiantes_por_semestre(semestre: int, session: Session = Depends(get_session)):
+    return listar_estudiantes_por_semestre(session, semestre)
 
