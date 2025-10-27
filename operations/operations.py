@@ -70,3 +70,26 @@ def eliminar_estudiante(session: Session, cedula: str):
 
     return {"mensaje": f"Estudiante con cédula {cedula} fue desactivado correctamente"}
 
+def crear_curso(session: Session, curso: Curso):
+    existente_codigo = session.exec(
+        select(Curso).where(Curso.codigo == curso.codigo)
+    ).first()
+    if existente_codigo:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Ya existe un curso con el código {curso.codigo}"
+        )
+
+    existente_nombre = session.exec(
+        select(Curso).where(Curso.nombre == curso.nombre)
+    ).first()
+    if existente_nombre:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Ya existe un curso con el nombre {curso.nombre}"
+        )
+
+    session.add(curso)
+    session.commit()
+    session.refresh(curso)
+    return curso

@@ -7,7 +7,8 @@ from data.models import Estudiante,Curso,Matricula
 from operations.operations import (crear_estudiante,
                                    listar_estudiantes_por_semestre,
                                    actualizar_estudiante,
-                                   eliminar_estudiante)
+                                   eliminar_estudiante,
+                                   crear_curso)
 
 app = FastAPI(
     title="API de Sistema de Gestion de Universidad",
@@ -38,3 +39,7 @@ def actualizar_estudiantes(cedula: str, datos: Estudiante, session: Session = De
 @app.delete("/estudiantes/{cedula}", summary="Eliminar un estudiante")
 def eliminar_estudiantes(cedula: str, session: Session = Depends(get_session)):
     return eliminar_estudiante(session, cedula)
+
+@app.post("/cursos/", response_model=Curso, summary="Crear un nuevo curso")
+def crear_nuevo_curso(curso: Curso, session: Session = Depends(get_session)):
+    return crear_curso(session, curso)
