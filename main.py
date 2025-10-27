@@ -27,3 +27,8 @@ def crear_nuevo_estudiante(estudiante: Estudiante, session: Session = Depends(ge
 def obtener_estudiantes_por_semestre(semestre: int, session: Session = Depends(get_session)):
     return listar_estudiantes_por_semestre(session, semestre)
 
+
+@app.put("/estudiantes/{cedula}")
+def actualizar_estudiante_endpoint(cedula: str, datos: Estudiante, session: Session = Depends(get_session)):
+    return actualizar_estudiante(session, cedula, datos)
+
