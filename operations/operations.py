@@ -55,3 +55,18 @@ def actualizar_estudiante(session: Session, cedula: str, datos: Estudiante):
     session.refresh(estudiante)
     return estudiante
 
+
+def eliminar_estudiante(session: Session, cedula: str):
+    estudiante = session.get(Estudiante, cedula)
+    if not estudiante:
+        raise HTTPException(status_code=404, detail=f"Estudiante con cédula {cedula} no encontrado")
+
+    if not estudiante.activo:
+        raise HTTPException(status_code=400, detail=f"El estudiante con cédula {cedula} ya está inactivo")
+
+    estudiante.activo = False
+    session.commit()
+    session.refresh(estudiante)
+
+    return {"mensaje": f"Estudiante con cédula {cedula} fue desactivado correctamente"}
+

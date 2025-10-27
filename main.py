@@ -4,7 +4,10 @@ from typing import List
 from utils.db import engine, crear_db, get_session
 from data.models import Estudiante,Curso,Matricula
 
-from operations.operations import (crear_estudiante,listar_estudiantes_por_semestre, actualizar_estudiante)
+from operations.operations import (crear_estudiante,
+                                   listar_estudiantes_por_semestre,
+                                   actualizar_estudiante,
+                                   eliminar_estudiante)
 
 app = FastAPI(
     title="API de Sistema de Gestion de Universidad",
@@ -29,6 +32,9 @@ def obtener_estudiantes_por_semestre(semestre: int, session: Session = Depends(g
 
 
 @app.put("/estudiantes/{cedula}")
-def actualizar_estudiante_endpoint(cedula: str, datos: Estudiante, session: Session = Depends(get_session)):
+def actualizar_estudiantes(cedula: str, datos: Estudiante, session: Session = Depends(get_session)):
     return actualizar_estudiante(session, cedula, datos)
 
+@app.delete("/estudiantes/{cedula}", summary="Eliminar un estudiante")
+def eliminar_estudiantes(cedula: str, session: Session = Depends(get_session)):
+    return eliminar_estudiante(session, cedula)
