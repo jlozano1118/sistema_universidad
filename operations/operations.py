@@ -124,3 +124,23 @@ def listar_cursos_por_codigo(session: Session, codigo: str):
         )
 
     return curso
+
+
+def actualizar_curso(session: Session, codigo: str, datos: Curso):
+    curso = session.get(Curso, codigo)
+    if not curso or not curso.activo:
+        raise HTTPException(status_code=404, detail=f"Curso con código {codigo} no encontrado o inactivo")
+
+    if datos.nombre != curso.nombre:
+        existente = session.exec(select(Curso).where(Curso.nombre == datos.nombre)).first()
+        if existente:
+            raise HTTPException(status_code=400, detail=f"El curso con nombre {datos.nombre} ya existe")
+
+    curso.nombre = datos.nombre
+    curso.creditos = datos.creditos
+    curso.horario = datos.horario
+    curso.activo = datos.activo
+
+    session.commit()
+    session.refresh(curso)
+    return curso
