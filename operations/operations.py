@@ -108,3 +108,19 @@ def listar_cursos_por_creditos(session: Session, creditos: int):
         )
 
     return cursos
+
+
+def listar_cursos_por_codigo(session: Session, codigo: str):
+    curso = session.exec(
+        select(Curso).where(
+            (Curso.codigo == codigo) & (Curso.activo == True)
+        )
+    ).first()
+
+    if not curso:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No se encontró un curso con el código {codigo}"
+        )
+
+    return curso

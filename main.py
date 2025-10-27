@@ -9,7 +9,8 @@ from operations.operations import (crear_estudiante,
                                    actualizar_estudiante,
                                    eliminar_estudiante,
                                    crear_curso,
-                                   listar_cursos_por_creditos)
+                                   listar_cursos_por_creditos,
+                                   listar_cursos_por_codigo)
 
 app = FastAPI(
     title="API de Sistema de Gestion de Universidad",
@@ -48,3 +49,7 @@ def crear_nuevo_curso(curso: Curso, session: Session = Depends(get_session)):
 @app.get("/cursos/creditos/{creditos}", response_model=List[Curso], summary="Listar cursos por número de créditos")
 def obtener_cursos_por_creditos(creditos: int, session: Session = Depends(get_session)):
     return listar_cursos_por_creditos(session, creditos)
+
+@app.get("/cursos/{codigo}", response_model=Curso, summary="Listar curso por código")
+def obtener_curso_por_codigo(codigo: str, session: Session = Depends(get_session)):
+    return listar_cursos_por_codigo(session, codigo)
