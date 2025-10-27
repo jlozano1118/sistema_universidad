@@ -93,3 +93,18 @@ def crear_curso(session: Session, curso: Curso):
     session.commit()
     session.refresh(curso)
     return curso
+
+def listar_cursos_por_creditos(session: Session, creditos: int):
+    cursos = session.exec(
+        select(Curso).where(
+            (Curso.creditos == creditos) & (Curso.activo == True)
+        )
+    ).all()
+
+    if not cursos:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No se encontraron cursos con {creditos} créditos"
+        )
+
+    return cursos
