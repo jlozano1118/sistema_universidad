@@ -159,3 +159,45 @@ def eliminar_curso(session: Session, codigo: str):
     session.refresh(curso)
 
     return {"mensaje": f"Curso con código {codigo} fue desactivado correctamente"}
+
+def crear_matricula(session: Session, matricula: Matricula):
+    if matricula.id_matricula is not None:
+        existente_id = session.get(Matricula, matricula.id_matricula)
+        if existente_id:
+            raise HTTPException(
+                status_code=400,
+                detail=f"El ID de matrícula {matricula.id_matricula} ya existe"
+            )
+    estudiante = session.get(Estudiante, matricula.cedula_estudiante)
+    if not estudiante or not estudiante.activo:
+        raise HTTPException(
+            status_code=404,
+            detail=f"El estudiante con cédula {matricula.cedula_estudiante} no existe o está inactivo"
+        )
+
+
+    curso = session.get(Curso, matricula.codigo_curso)
+    if not curso or not curso.activo:
+        raise HTTPException(
+            status_code=404,
+            detail=f"El curso con código {matricula.codigo_curso} no existe o está inactivo"
+        )
+
+
+    existente = session.exec(
+        select(Matricula).where(
+            (Matricula.cedula_estudiante == matricula.cedula_estudiante) &
+            (Matricula.codigo_curso == matricula.codigo_curso)
+        )
+    ).first()
+
+    if existente:
+        raise HTTPException(
+            status_code=400,
+            detail=f"El estudiante {matricula.cedula_estudiante} ya está matriculado en el curso {matricula.codigo_curso}"
+        )
+
+    session.add(matricula)
+    session.commit()
+    session.refresh(matricula)
+    return matricula
