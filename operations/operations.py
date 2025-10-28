@@ -144,3 +144,18 @@ def actualizar_curso(session: Session, codigo: str, datos: Curso):
     session.commit()
     session.refresh(curso)
     return curso
+
+
+def eliminar_curso(session: Session, codigo: str):
+    curso = session.get(Curso, codigo)
+    if not curso:
+        raise HTTPException(status_code=404, detail=f"Curso con código {codigo} no encontrado")
+
+    if not curso.activo:
+        raise HTTPException(status_code=400, detail=f"El curso con código {codigo} ya está inactivo")
+
+    curso.activo = False
+    session.commit()
+    session.refresh(curso)
+
+    return {"mensaje": f"Curso con código {codigo} fue desactivado correctamente"}
