@@ -201,3 +201,41 @@ def crear_matricula(session: Session, matricula: Matricula):
     session.commit()
     session.refresh(matricula)
     return matricula
+
+
+def cursos_estudiante(session: Session, cedula_estudiante: str):
+
+    estudiante = session.get(Estudiante, cedula_estudiante)
+    if not estudiante or not estudiante.activo:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Estudiante con cédula {cedula_estudiante} no encontrado o inactivo"
+        )
+
+    matriculas = session.exec(
+        select(Matricula).where(
+            (Matricula.cedula_estudiante == cedula_estudiante) &
+            (Matricula.activo == True)
+        )
+    ).all()
+
+    if not matriculas:
+        raise HTTPException(
+            status_code=404,
+            detail=f"El estudiante con cédula {cedula_estudiante} no tiene cursos activos"
+        )
+
+
+    cursos = []
+    for m in matriculas:
+        curso = session.get(Curso, m.codigo_curso)
+        if curso and curso.activo:
+            cursos.append(curso)
+
+    if not cursos:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No se encontraron cursos activos para el estudiante {cedula_estudiante}"
+        )
+
+    return cursos
