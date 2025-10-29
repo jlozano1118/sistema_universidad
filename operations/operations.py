@@ -277,3 +277,35 @@ def obtener_estudiantes_por_curso(session: Session, codigo_curso: str):
 
     return estudiantes
 
+def desmatricular_estudiante(session: Session, cedula_estudiante: str, codigo_curso: str):
+
+    estudiante = session.get(Estudiante, cedula_estudiante)
+    if not estudiante:
+        raise HTTPException(status_code=404, detail=f"Estudiante con cédula {cedula_estudiante} no encontrado")
+
+    curso = session.get(Curso, codigo_curso)
+    if not curso:
+        raise HTTPException(status_code=404, detail=f"Curso con código {codigo_curso} no encontrado")
+
+
+    query = select(Matricula).where(
+        Matricula.cedula_estudiante == cedula_estudiante,
+        Matricula.codigo_curso == codigo_curso
+    )
+    matricula = session.exec(query).first()
+
+    if not matricula:
+        raise HTTPException(status_code=404, detail="El estudiante no está matriculado en este curso")
+
+
+    if not matricula.activo:
+        raise HTTPException(status_code=400, detail="El estudiante ya fue desmatriculado de este curso")
+
+
+    matricula.activo = False
+    session.commit()
+    session.refresh(matricula)
+
+    return {
+        "mensaje": f"El estudiante {cedula_estudiante} fue desmatriculado del curso {codigo_curso} correctamente"
+    }

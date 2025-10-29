@@ -15,7 +15,9 @@ from operations.operations import (crear_estudiante,
                                    eliminar_curso,
                                    crear_matricula,
                                    cursos_estudiante,
-                                   obtener_estudiantes_por_curso)
+                                   obtener_estudiantes_por_curso,
+                                   desmatricular_estudiante)
+
 
 app = FastAPI(
     title="API de Sistema de Gestion de Universidad",
@@ -78,3 +80,6 @@ def eliminar_curso_por_codigo(codigo: str, session: Session = Depends(get_sessio
 def matricular_estudiante(matricula: Matricula, session: Session = Depends(get_session)):
     return crear_matricula(session, matricula)
 
+@app.put("/matriculas/desmatricular/{cedula_estudiante}/{codigo_curso}")
+def desmatricular(cedula_estudiante: str, codigo_curso: str, session: Session = Depends(get_session)):
+    return desmatricular_estudiante(session, cedula_estudiante, codigo_curso)
