@@ -239,3 +239,41 @@ def cursos_estudiante(session: Session, cedula_estudiante: str):
         )
 
     return cursos
+
+
+def obtener_estudiantes_por_curso(session: Session, codigo_curso: str):
+    curso = session.get(Curso, codigo_curso)
+    if not curso or not curso.activo:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Curso con código {codigo_curso} no encontrado o inactivo"
+        )
+
+
+    matriculas = session.exec(
+        select(Matricula).where(
+            (Matricula.codigo_curso == codigo_curso) &
+            (Matricula.activo == True)
+        )
+    ).all()
+
+    if not matriculas:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No hay estudiantes matriculados en el curso {codigo_curso}"
+        )
+
+    estudiantes = []
+    for m in matriculas:
+        estudiante = session.get(Estudiante, m.cedula_estudiante)
+        if estudiante and estudiante.activo:
+            estudiantes.append(estudiante)
+
+    if not estudiantes:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No se encontraron estudiantes activos en el curso {codigo_curso}"
+        )
+
+    return estudiantes
+
