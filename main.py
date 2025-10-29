@@ -16,7 +16,8 @@ from operations.operations import (crear_estudiante,
                                    crear_matricula,
                                    cursos_estudiante,
                                    obtener_estudiantes_por_curso,
-                                   desmatricular_estudiante)
+                                   desmatricular_estudiante,
+                                   obtener_estudiantes_inactivos)
 
 
 app = FastAPI(
@@ -48,6 +49,10 @@ def actualizar_estudiantes(cedula: str, datos: Estudiante, session: Session = De
 @app.delete("/estudiantes/{cedula}", summary="Eliminar un estudiante")
 def eliminar_estudiantes(cedula: str, session: Session = Depends(get_session)):
     return eliminar_estudiante(session, cedula)
+
+@app.get("/estudiantes/inactivos", summary="Historico de estudiantes eliminados")
+def listar_estudiantes_inactivos(session: Session = Depends(get_session)):
+    return obtener_estudiantes_inactivos(session)
 
 @app.get("/estudiantes/{cedula}/cursos", response_model=List[Curso], summary="Listar cursos de un estudiante")
 def listar_cursos_de_estudiante(cedula: str, session: Session = Depends(get_session)):

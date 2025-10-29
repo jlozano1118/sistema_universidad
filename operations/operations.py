@@ -309,3 +309,14 @@ def desmatricular_estudiante(session: Session, cedula_estudiante: str, codigo_cu
     return {
         "mensaje": f"El estudiante {cedula_estudiante} fue desmatriculado del curso {codigo_curso} correctamente"
     }
+
+
+def obtener_estudiantes_inactivos(session: Session):
+    estudiantes_inactivos = session.exec(
+        select(Estudiante).where(Estudiante.activo == False)
+    ).all()
+
+    if not estudiantes_inactivos:
+        raise HTTPException(status_code=404, detail="No hay estudiantes inactivos registrados")
+
+    return estudiantes_inactivos
