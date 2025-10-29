@@ -160,6 +160,7 @@ def eliminar_curso(session: Session, codigo: str):
 
     return {"mensaje": f"Curso con código {codigo} fue desactivado correctamente"}
 
+
 def crear_matricula(session: Session, matricula: Matricula):
     if matricula.id_matricula is not None:
         existente_id = session.get(Matricula, matricula.id_matricula)
